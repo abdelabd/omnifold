@@ -48,6 +48,7 @@ class MultiFold():
                  epochs = 50,
                  lr = 1e-4,
                  early_stop = 10,
+                 lr_patience = 15,
                  start = 0,
                  train_frac = 0.8,
                  size = 1,
@@ -110,6 +111,7 @@ class MultiFold():
         self.rank = rank
         self.verbose = verbose*(self.rank==0)
         self.log_file =  open(os.path.join(log_folder,'log_{}.txt'.format(self.name)),'w')
+        self.lr_patience = lr_patience
         
         #Model specific parameters
         self.model1 = model_reco
@@ -236,7 +238,7 @@ class MultiFold():
             else:
                 callbacks = []
 
-            callbacks = callbacks + [ReduceLROnPlateau(patience=1000, min_lr=1e-7,
+            callbacks = callbacks + [ReduceLROnPlateau(patience=self.lr_patience, min_lr=1e-7,
                                                        verbose=self.verbose,
                                                        monitor="val_loss"),
                                      EarlyStopping(patience=self.patience,
